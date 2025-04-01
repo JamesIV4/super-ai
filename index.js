@@ -775,6 +775,7 @@ exports.handler = async (event, context) => {
       SessionEndedRequestHandler
     )
     .addErrorHandlers(ErrorHandler)
+    .withApiClient(new Alexa.DefaultApiClient())
     .create();
 
   return skill.invoke(event, context);

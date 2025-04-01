@@ -252,6 +252,27 @@ const getGoodbyeString = () => {
   return getRandomString(strings);
 };
 
+// Story preparation status messages
+const storyPreparationMessages = {
+  longWait: [
+    "Your story is taking longer than expected. <break time='1s'/> Would you like to keep waiting?",
+  ],
+  mediumWait: [
+    "I'm still working on your story. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
+    "Your story is still coming together. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
+    "I'm still crafting your story with care. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
+    "The story is still taking shape. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
+    "I'm still adding the finishing touches to your story. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
+  ],
+  shortWait: [
+    "I'm still preparing your story. Please wait. <break time='10s'/> Would you like to check if your story is ready now?  ",
+    "Your story is in the works. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
+    "I'm working on your story. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
+    "The story is being created. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
+    "I'm getting your story ready. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
+  ],
+};
+
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return (
@@ -414,10 +435,11 @@ const StoryIntentHandler = {
     // Start the background story preparation (completely detached from this handler)
     prepareStoryInBackground(storySubject);
 
-    // Set session attribute to indicate we're waiting for story confirmation
+    // Set session attributes to indicate we're waiting for story confirmation
     const sessionAttributes =
       handlerInput.attributesManager.getSessionAttributes();
     sessionAttributes.awaitingStoryConfirmation = true;
+    sessionAttributes.storyError = false;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     // Immediately respond to the user
@@ -530,6 +552,10 @@ const YesIntentHandler = {
       // There was an error generating the story
       const subject = currentStory.subject || "";
 
+      // Set the error flag in session attributes
+      sessionAttributes.storyError = true;
+      handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
       // Clear the current story and reset the flag
       currentStory = null;
       sessionAttributes.awaitingStoryConfirmation = false;
@@ -537,7 +563,7 @@ const YesIntentHandler = {
 
       return handlerInput.responseBuilder
         .speak(
-          `I'm sorry, I had trouble creating your story about ${subject}. Would you like to try a different story?`
+          `I'm sorry, I had trouble creating your story: tell ${subject}. Please try asking for a story again.`
         )
         .reprompt("Would you like to try asking for a different story?")
         .getResponse();
@@ -549,25 +575,19 @@ const YesIntentHandler = {
       if (waitTime > 90000) {
         // More than 90 seconds - give the option to cancel
         return handlerInput.responseBuilder
-          .speak(
-            "Your story is taking longer than expected. Would you like to keep waiting or try a different request?"
-          )
-          .reprompt("Would you like to keep waiting or try something else?")
+          .speak(getRandomString(storyPreparationMessages.longWait))
+          .reprompt("Would you like to keep waiting?")
           .getResponse();
       } else if (waitTime > 45000) {
         // Between 45-90 seconds
         return handlerInput.responseBuilder
-          .speak(
-            "I'm still working on your story. Quality takes time! Would you like to check if it's ready now?"
-          )
-          .reprompt("Would you like to check if it's ready now?")
+          .speak(getRandomString(storyPreparationMessages.mediumWait))
+          .reprompt("Would you like to check if your story ready now?")
           .getResponse();
       } else {
         // Less than 45 seconds
         return handlerInput.responseBuilder
-          .speak(
-            "I'm still preparing your story. Would you like to check if it's ready now?"
-          )
+          .speak(getRandomString(storyPreparationMessages.shortWait))
           .reprompt("Would you like to check if your story is ready now?")
           .getResponse();
       }

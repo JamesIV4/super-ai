@@ -1,0 +1,154 @@
+timestamp,message
+1743526765102,"INIT_START Runtime Version: nodejs:16.v70	Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:46b99f635743b15febf77bc6d1f44226c4c9a8f3011afaeab9001daeca28753c
+"
+1743526765972,"START RequestId: 61a5442a-b5df-4d37-84aa-2852028cf6e7 Version: 201
+"
+1743526766025,"2025-04-01T16:59:26.025Z	61a5442a-b5df-4d37-84aa-2852028cf6e7	INFO	~~~~~~~~~~~~ Session ended with reason: USER_INITIATED ~~~~~~~~~~~~
+      
+"
+1743526766026,"2025-04-01T16:59:26.026Z	61a5442a-b5df-4d37-84aa-2852028cf6e7	INFO	~~~~~~~~~~~~ Session ended ~~~~~~~~~~~~ {""version"":""1.0"",""session"":{""new"":false,""sessionId"":""amzn1.echo-api.session.4be6ff4f-8d95-4f1d-8c5f-a6bf535a4c7f"",""application"":{""applicationId"":""amzn1.ask.skill.d1e4936f-5976-4d95-81e8-52fbebe0a304""},""attributes"":{""awaitingStoryConfirmation"":false},""user"":{""userId"":""amzn1.ask.account.AMAWPTB5STJEFTXAFYTT23YNQSUGEW2NUHDS3OHHVD46BTJED366XMHW5FWDZAAAFES6UMW4KJKK5RYPECJSLPB7IVNYGMMH3AMTP54KMH7AW5SV2AGDZ3GNZFZEFLISWJ2YVWNHNEKKXJXRS774F4UFKDC7SS4VTXRHPTNCTDRBXEIXN4PHLZADLSMLHO6BMXKA4MIXO6NOT3K3QISMY7LKQW6NSSXGJMOFD5JSVGOA""}},""context"":{""Viewports"":[{""type"":""APL"",""id"":""medHub"",""shape"":""RECTANGLE"",""dpi"":160,""presentationType"":""OVERLAY"",""canRotate"":false,""configuration"":{""current"":{""mode"":""HUB"",""video"":{""codecs"":[""H_264_42"",""H_264_41""]},""size"":{""type"":""DISCRETE"",""pixelWidth"":1280,""pixelHeight"":800}}}}],""Viewport"":{""experiences"":[{""arcMinuteWidth"":221,""arcMinuteHeight"":162,""canRotate"":false,""canResize"":false}],""mode"":""HUB"",""shape"":""RECTANGLE"",""pixelWidth"":1280,""pixelHeight"":800,""dpi"":160,""currentPixelWidth"":1280,""currentPixelHeight"":800,""touch"":[""SINGLE""],""keyboard"":[""DIRECTION""],""video"":{""codecs"":[""H_264_42"",""H_264_41""]}},""System"":{""application"":{""applicationId"":""amzn1.ask.skill.d1e4936f-5976-4d95-81e8-52fbebe0a304""},""user"":{""userId"":""amzn1.ask.account.AMAWPTB5STJEFTXAFYTT23YNQSUGEW2NUHDS3OHHVD46BTJED366XMHW5FWDZAAAFES6UMW4KJKK5RYPECJSLPB7IVNYGMMH3AMTP54KMH7AW5SV2AGDZ3GNZFZEFLISWJ2YVWNHNEKKXJXRS774F4UFKDC7SS4VTXRHPTNCTDRBXEIXN4PHLZADLSMLHO6BMXKA4MIXO6NOT3K3QISMY7LKQW6NSSXGJMOFD5JSVGOA""},""device"":{""deviceId"":""amzn1.ask.device.AMA5QN53C36KSES6V4SLZTQLQM3NAKYFALEIHEVH5ABOKNPDJM5JSCLI3SW5A5JAGTZO3RRJXODQMN7X3WPT3VP4EXW3DDAU2ZHE35K77U57VQN6FCSRFJIJKT7TBYDFD7XQMHH2GK7GISY2L7ABQTCCP24L3NDS47MOPBKBUEE2GHRZOQ66QAQ67VUENJZFFBT6LLKHOMQBTU4P"",""supportedInterfaces"":{""Alexa.Presentation.APL"":{""runtime"":{""maxVersion"":""2024.3""}}}},""apiEndpoint"":""https://api.amazonalexa.com"",""apiAccessToken"":""eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLmQxZTQ5MzZmLTU5NzYtNGQ5NS04MWU4LTUyZmJlYmUwYTMwNCIsImV4cCI6MTc0MzUyNjgyNCwiaWF0IjoxNzQzNTI2NzY0LCJuYmYiOjE3NDM1MjY3NjQsInByaXZhdGVDbGFpbXMiOnsiaXNGb3JSQSI6ImZhbHNlIiwiY29udGV4dCI6IkFBQUFBQUFBQUFCVUIza0VNQ2ZSZVdsb1gydXd3WWR2ZUFFQUFBQUFBQURrVkRpeC8zYWtNSEJyMGlsVFVFaHRkbUI5TWlNUzg5a1BVZ3M5TmtoSXNsWDZUemxFNVJ3akdkNmZPWjZSb3prTEpuOXJNRDhLS1NmMXNqMXdvUW82emhIRkRxR3d6dXd3ZmZrem5ET0cyNVErOEVIOFlXTEN6YTRITnh4Z2ZPVE9TYmVHa1U1VFh1TkNta1h2blpHQ2lkblk1YjBWL2N5SkpWc1BMTkE0bGRWYzJYd0V6Ti9uZCtkR2E5UkZsaUhrbnltYXVyVzdkaXpmTU1pYitMMytha0N0ZnFqN1FRUzJWcnlPSTJMemgrOWRuOUsvMTBMaG9sU24ramNlODl1alk0RkFBMUJjZ1o1M1A2Z1E2QWJtZ2xjOTZlYWY4bjloakpnQnBqVFBHNUN6eGR1Sy91bVhDMDJFVlZobmF5bVRpUEVkQXRSR29CVnZBVGxuV0xBSjB0bjZWcG0zUjB0QW83a2J2c1FIOFZUSDZKRjl6MHBYdDc1bTE2Vm8vOThEMFRrVWFlaC9HSlVydGpDaGE5Zm1NK0ZyMXQ0ZXBtZklCbzhtMzVmVHBTMmhSRFkxRDJFZHkwRVdIZmFSRzBYOVRpU0E4dzByNCtESkxVMFJ6eERwMGFlQlBGUzd4T1FIRDhIblhlWXhFNnZBNUJFdkVlbTciLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQU1BNVFONTNDMzZLU0VTNlY0U0xaVFFMUU0zTkFLWUZBTEVJSEVWSDVBQk9LTlBESk01SlNDTEkzU1c1QTVKQUdUWk8zUlJKWE9EUU1ON1gzV1BUM1ZQNEVYVzNEREFVMlpIRTM1Szc3VTU3VlFONkZDU1JGSklKS1Q3VEJZREZEN1hRTUhIMkdLN0dJU1kyTDdBQlFUQ0NQMjRMM05EUzQ3TU9QQktCVUVFMkdIUlpPUTY2UUFRNjdWVUVOSlpGRkJUNkxMS0hPTVFCVFU0UCIsInVzZXJJZCI6ImFtem4xLmFzay5hY2NvdW50LkFNQVdQVEI1U1RKRUZUWEFGWVRUMjNZTlFTVUdFVzJOVUhEUzNPSEhWRDQ2QlRKRUQzNjZYTUhXNUZXRFpBQUFGRVM2VU1XNEtKS0s1UllQRUNKU0xQQjdJVk5ZR01NSDNBTVRQNTRLTUg3QVc1U1YyQUdEWjNHTlpGWkVGTElTV0oyWVZXTkhORUtLWEpYUlM3NzRGNFVGS0RDN1NTNFZUWFJIUFROQ1REUkJYRUlYTjRQSExaQURMU01MSE82Qk1YS0E0TUlYTzZOT1QzSzNRSVNNWTdMS1FXNk5TU1hHSk1PRkQ1SlNWR09BIn19.ab_Ug9hKgXcWpBRrKZIFyBLWv6TOJzUCzhFj-6GVpKlkOE42K1hmjiR0BZtZZ-Pppe2K00vhYna7AGpscA5WqP5s6U_lrfrmdMz06u2NopchaGhz-GELHms3WOqJcET253yn5wkaLO0Ria6E3XViSC9mA-r3E3_OZPwajRSnNBgc74wd_Ya_nluHNLTCc9bmf8kEf1UNHl-1ajtsO0XbSTjHTzufMpWLkKB7399x8TztI8K6H3OTxEJWlJ_5VTN0DbI1_ZKAwNeY5NK5vt1jm1hQOKoz7j0WKJ4nhLAHz5TgkQfLY3cxywpCQLhIRUZahHeax548mrGaRK852lleIA""}},""request"":{""type"":""SessionEndedRequest"",""requestId"":""amzn1.echo-api.request.1c05c62c-034e-4f32-8ae6-da5945cc95f2"",""timestamp"":""2025-04-01T16:59:24Z"",""locale"":""en-US"",""reason"":""USER_INITIATED""}}
+"
+1743526766029,"END RequestId: 61a5442a-b5df-4d37-84aa-2852028cf6e7
+"
+1743526766029,"REPORT RequestId: 61a5442a-b5df-4d37-84aa-2852028cf6e7	Duration: 57.76 ms	Billed Duration: 58 ms	Memory Size: 512 MB	Max Memory Used: 93 MB	Init Duration: 868.37 ms	
+"
+1743526766139,"START RequestId: e51a3b6f-d72a-4fbc-8f64-e435f967d34e Version: 201
+"
+1743526766142,"2025-04-01T16:59:26.142Z	e51a3b6f-d72a-4fbc-8f64-e435f967d34e	INFO	------------------- Got LaunchRequest -------------------
+"
+1743526766144,"END RequestId: e51a3b6f-d72a-4fbc-8f64-e435f967d34e
+"
+1743526766144,"REPORT RequestId: e51a3b6f-d72a-4fbc-8f64-e435f967d34e	Duration: 4.45 ms	Billed Duration: 5 ms	Memory Size: 512 MB	Max Memory Used: 93 MB	
+"
+1743526773976,"START RequestId: 42c2ebe2-371c-44f6-8eb2-47ebf8ca1935 Version: 201
+"
+1743526773978,"2025-04-01T16:59:33.978Z	42c2ebe2-371c-44f6-8eb2-47ebf8ca1935	INFO	------------------- Got StoryIntent request ------------------- me a story about a 5 year-old named Jameson
+"
+1743526773978,"2025-04-01T16:59:33.978Z	42c2ebe2-371c-44f6-8eb2-47ebf8ca1935	INFO	Starting background story preparation for: me a story about a 5 year-old named Jameson
+"
+1743526774024,"END RequestId: 42c2ebe2-371c-44f6-8eb2-47ebf8ca1935
+"
+1743526774024,"REPORT RequestId: 42c2ebe2-371c-44f6-8eb2-47ebf8ca1935	Duration: 47.61 ms	Billed Duration: 48 ms	Memory Size: 512 MB	Max Memory Used: 94 MB	
+"
+1743526786743,"START RequestId: 90ea49a4-fe2d-42b8-85d6-0c6513beae77 Version: 201
+"
+1743526786744,"2025-04-01T16:59:46.744Z	90ea49a4-fe2d-42b8-85d6-0c6513beae77	INFO	------------------- Got YesIntent -------------------
+"
+1743526786745,"END RequestId: 90ea49a4-fe2d-42b8-85d6-0c6513beae77
+"
+1743526786745,"REPORT RequestId: 90ea49a4-fe2d-42b8-85d6-0c6513beae77	Duration: 2.12 ms	Billed Duration: 3 ms	Memory Size: 512 MB	Max Memory Used: 94 MB	
+"
+1743526799535,"START RequestId: fbae8aa5-c384-41b7-8dfb-f80caa641eb1 Version: 201
+"
+1743526799540,"2025-04-01T16:59:59.540Z	fbae8aa5-c384-41b7-8dfb-f80caa641eb1	INFO	------------------- Got YesIntent -------------------
+"
+1743526799542,"END RequestId: fbae8aa5-c384-41b7-8dfb-f80caa641eb1
+"
+1743526799542,"REPORT RequestId: fbae8aa5-c384-41b7-8dfb-f80caa641eb1	Duration: 7.14 ms	Billed Duration: 8 ms	Memory Size: 512 MB	Max Memory Used: 95 MB	
+"
+1743526807843,"START RequestId: 2724a2fa-d04b-4c91-8509-adf35c1ef0e4 Version: 201
+"
+1743526807845,"2025-04-01T17:00:07.845Z	2724a2fa-d04b-4c91-8509-adf35c1ef0e4	INFO	------------------- Got YesIntent -------------------
+"
+1743526807846,"END RequestId: 2724a2fa-d04b-4c91-8509-adf35c1ef0e4
+"
+1743526807846,"REPORT RequestId: 2724a2fa-d04b-4c91-8509-adf35c1ef0e4	Duration: 2.76 ms	Billed Duration: 3 ms	Memory Size: 512 MB	Max Memory Used: 95 MB	
+"
+1743526816580,"START RequestId: cd65cd54-3521-4a86-8b8d-6847da4fcc89 Version: 201
+"
+1743526816602,"2025-04-01T17:00:16.602Z	cd65cd54-3521-4a86-8b8d-6847da4fcc89	INFO	------------------- Got YesIntent -------------------
+"
+1743526816642,"END RequestId: cd65cd54-3521-4a86-8b8d-6847da4fcc89
+"
+1743526816642,"REPORT RequestId: cd65cd54-3521-4a86-8b8d-6847da4fcc89	Duration: 62.08 ms	Billed Duration: 63 ms	Memory Size: 512 MB	Max Memory Used: 95 MB	
+"
+1743526826096,"START RequestId: 8837ce27-befa-4f55-8aa1-e585d384f155 Version: 201
+"
+1743526826099,"2025-04-01T17:00:26.099Z	8837ce27-befa-4f55-8aa1-e585d384f155	INFO	------------------- Got YesIntent -------------------
+"
+1743526826100,"END RequestId: 8837ce27-befa-4f55-8aa1-e585d384f155
+"
+1743526826100,"REPORT RequestId: 8837ce27-befa-4f55-8aa1-e585d384f155	Duration: 4.04 ms	Billed Duration: 5 ms	Memory Size: 512 MB	Max Memory Used: 95 MB	
+"
+1743526836248,"START RequestId: 5c4fd87c-0cfe-4224-af9f-8acfb5926eaa Version: 201
+"
+1743526836256,"2025-04-01T17:00:36.256Z	5c4fd87c-0cfe-4224-af9f-8acfb5926eaa	INFO	------------------- Got YesIntent -------------------
+"
+1743526836282,"END RequestId: 5c4fd87c-0cfe-4224-af9f-8acfb5926eaa
+"
+1743526836282,"REPORT RequestId: 5c4fd87c-0cfe-4224-af9f-8acfb5926eaa	Duration: 34.20 ms	Billed Duration: 35 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526844827,"START RequestId: a8c91710-f0fc-452a-90fc-015e6870e453 Version: 201
+"
+1743526844884,"2025-04-01T17:00:44.884Z	a8c91710-f0fc-452a-90fc-015e6870e453	INFO	------------------- Got YesIntent -------------------
+"
+1743526844922,"END RequestId: a8c91710-f0fc-452a-90fc-015e6870e453
+"
+1743526844922,"REPORT RequestId: a8c91710-f0fc-452a-90fc-015e6870e453	Duration: 95.62 ms	Billed Duration: 96 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526852197,"START RequestId: 46cdccc7-4c8f-4905-9148-9840e2819bdc Version: 201
+"
+1743526852198,"2025-04-01T17:00:52.198Z	46cdccc7-4c8f-4905-9148-9840e2819bdc	INFO	------------------- Got YesIntent -------------------
+"
+1743526852203,"END RequestId: 46cdccc7-4c8f-4905-9148-9840e2819bdc
+"
+1743526852203,"REPORT RequestId: 46cdccc7-4c8f-4905-9148-9840e2819bdc	Duration: 5.58 ms	Billed Duration: 6 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526860439,"2025-04-01T17:01:00.439Z	46cdccc7-4c8f-4905-9148-9840e2819bdc	INFO	OpenAI API call failed, retrying (1/2)... {""cause"":{""message"":""request to https://api.openai.com/v1/chat/completions failed, reason: socket hang up"",""type"":""system"",""errno"":""ECONNRESET"",""code"":""ECONNRESET""}}
+"
+1743526860440,"START RequestId: dede10a1-ae56-450e-963f-d6464f365659 Version: 201
+"
+1743526860441,"2025-04-01T17:01:00.441Z	dede10a1-ae56-450e-963f-d6464f365659	INFO	------------------- Got YesIntent -------------------
+"
+1743526860442,"END RequestId: dede10a1-ae56-450e-963f-d6464f365659
+"
+1743526860442,"REPORT RequestId: dede10a1-ae56-450e-963f-d6464f365659	Duration: 1.70 ms	Billed Duration: 2 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526867925,"START RequestId: 2c5028eb-acdb-47ef-9a99-ac3dd6c2fa05 Version: 201
+"
+1743526867926,"2025-04-01T17:01:07.926Z	2c5028eb-acdb-47ef-9a99-ac3dd6c2fa05	INFO	------------------- Got YesIntent -------------------
+"
+1743526867927,"END RequestId: 2c5028eb-acdb-47ef-9a99-ac3dd6c2fa05
+"
+1743526867927,"REPORT RequestId: 2c5028eb-acdb-47ef-9a99-ac3dd6c2fa05	Duration: 2.10 ms	Billed Duration: 3 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526877362,"START RequestId: 61cb9588-9583-4654-a27b-4011c50cf600 Version: 201
+"
+1743526877363,"2025-04-01T17:01:17.363Z	61cb9588-9583-4654-a27b-4011c50cf600	INFO	------------------- Got YesIntent -------------------
+"
+1743526877366,"END RequestId: 61cb9588-9583-4654-a27b-4011c50cf600
+"
+1743526877366,"REPORT RequestId: 61cb9588-9583-4654-a27b-4011c50cf600	Duration: 3.41 ms	Billed Duration: 4 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526885873,"2025-04-01T17:01:25.873Z	209f611d-6a88-478c-b6cb-4fa5a80b49f0	INFO	------------------- Got YesIntent -------------------
+"
+1743526885873,"START RequestId: 209f611d-6a88-478c-b6cb-4fa5a80b49f0 Version: 201
+"
+1743526885874,"END RequestId: 209f611d-6a88-478c-b6cb-4fa5a80b49f0
+"
+1743526885874,"REPORT RequestId: 209f611d-6a88-478c-b6cb-4fa5a80b49f0	Duration: 1.65 ms	Billed Duration: 2 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526894655,"2025-04-01T17:01:34.655Z	5e8d62de-7118-45f4-bb20-370149c2a8b1	INFO	------------------- Got YesIntent -------------------
+"
+1743526894655,"START RequestId: 5e8d62de-7118-45f4-bb20-370149c2a8b1 Version: 201
+"
+1743526894657,"END RequestId: 5e8d62de-7118-45f4-bb20-370149c2a8b1
+"
+1743526894657,"REPORT RequestId: 5e8d62de-7118-45f4-bb20-370149c2a8b1	Duration: 2.20 ms	Billed Duration: 3 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526903085,"START RequestId: 6f30fd4d-7cb6-4fb3-adb1-f0f126d614b1 Version: 201
+"
+1743526903086,"2025-04-01T17:01:43.086Z	6f30fd4d-7cb6-4fb3-adb1-f0f126d614b1	INFO	------------------- Got NoIntent -------------------
+"
+1743526903087,"END RequestId: 6f30fd4d-7cb6-4fb3-adb1-f0f126d614b1
+"
+1743526903087,"REPORT RequestId: 6f30fd4d-7cb6-4fb3-adb1-f0f126d614b1	Duration: 1.81 ms	Billed Duration: 2 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"
+1743526914240,"START RequestId: 5f4a243e-5f60-4c35-be47-756649440fbc Version: 201
+"
+1743526914242,"2025-04-01T17:01:54.242Z	5f4a243e-5f60-4c35-be47-756649440fbc	INFO	------------------- Got CancelAndStopIntent -------------------
+"
+1743526914243,"END RequestId: 5f4a243e-5f60-4c35-be47-756649440fbc
+"
+1743526914243,"REPORT RequestId: 5f4a243e-5f60-4c35-be47-756649440fbc	Duration: 2.75 ms	Billed Duration: 3 ms	Memory Size: 512 MB	Max Memory Used: 96 MB	
+"

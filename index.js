@@ -1,6 +1,5 @@
 const AWS = require("aws-sdk");
 const Alexa = require("ask-sdk-core");
-const OpenAI = require("openai");
 
 const { openai } = require("./api");
 
@@ -14,7 +13,9 @@ const buildAplResponse = (
   handlerInput,
   text,
   title = "Super AI",
-  speechText = null
+  speechText = null,
+  type = "response",
+  hintText = null
 ) => {
   const aplSupported =
     handlerInput.requestEnvelope.context.System.device.supportedInterfaces[
@@ -23,26 +24,57 @@ const buildAplResponse = (
 
   if (!aplSupported) return null;
 
+  const formatIntroHeader = (text) => {
+    let index = text.indexOf(".");
+    if (index !== -1) {
+      return (
+        text.substring(0, index + 1) + "<br />" + text.substring(index + 1)
+      );
+    }
+    return text;
+  };
+
+  const isIntro = type === "intro";
+  const document = isIntro ? introScreenApl : responseScreenApl;
+  const token = isIntro ? "intro" : "response";
+
   return {
     type: "Alexa.Presentation.APL.RenderDocument",
-    token: "response",
-    document: responseScreenApl,
-    datasources: {
-      longTextTemplateData: {
-        type: "object",
-        objectId: "responseDisplay",
-        properties: {
-          backgroundImage: {
-            sources: [{ url: BACKGROUND_IMAGE_URL }],
+    token,
+    document,
+    datasources: isIntro
+      ? {
+          headlineTemplateData: {
+            type: "object",
+            properties: {
+              textContent: {
+                primaryText: {
+                  text: formatIntroHeader(text),
+                },
+              },
+              hintText,
+              backgroundImage: {
+                sources: [{ url: BACKGROUND_IMAGE_URL }],
+              },
+            },
           },
-          title,
-          textContent: {
-            primaryText: { text },
+        }
+      : {
+          longTextTemplateData: {
+            type: "object",
+            objectId: "responseDisplay",
+            properties: {
+              backgroundImage: {
+                sources: [{ url: BACKGROUND_IMAGE_URL }],
+              },
+              title,
+              textContent: {
+                primaryText: { text },
+              },
+              speechText: speechText || text,
+            },
           },
-          speechText: speechText || text,
         },
-      },
-    },
   };
 };
 
@@ -109,26 +141,6 @@ const LaunchRequestHandler = {
   handle(handlerInput) {
     console.log("------------------- Got LaunchRequest -------------------");
 
-    /* const introStrings = [
-			'Welcome to Super AI. Ask me anything!',
-			'Welcome to Super AI. Feel free to ask me anything!',
-			'Welcome to Super AI. I\'m here to answer your questions!',
-			'Welcome to Super AI. How can I assist you today?',
-			'Welcome to Super AI. Ready to help with any queries!',
-			'Welcome to Super AI. Ask away, I\'m listening!',
-			'Welcome to Super AI. What can I do for you?',
-			'Welcome to Super AI. Need information? Just ask!',
-			'Welcome to Super AI. Excited to chat with you!',
-			'Welcome to Super AI. How can I support you?',
-			'Welcome to Super AI. I\'m at your service!',
-			'Welcome to Super AI. Let\'s dive into your questions!',
-			'Welcome to Super AI. Here to provide answers!',
-			'Welcome to Super AI. Curious about anything? Ask!',
-			'Welcome to Super AI. I\'m here to assist and inform!',
-			'Welcome to Super AI. Ask me anything you\'d like!',
-			'Welcome to Super AI. How may I help you today?',
-			'Welcome to Super AI. Let\'s get started!'
-		]; */
     const introStrings = ["Listening..."];
 
     const animals = [
@@ -175,58 +187,25 @@ const LaunchRequestHandler = {
     const introString = getRandomString(introStrings);
     const speakOutput = `<amazon:emotion name='excited' intensity='medium'>${introString}</amazon:emotion>`;
 
-    const formatIntroHeader = (text) => {
-      let index = text.indexOf(".");
-      if (index !== -1) {
-        return (
-          text.substring(0, index + 1) + "<br />" + text.substring(index + 1)
-        );
-      }
-      return text;
-    };
-
     const chosenAnimal = getRandomString(animals);
     const hintText = `Try, "Tell me a story about ${getAorAn(
       chosenAnimal
     )} ${chosenAnimal} ${getRandomString(whimsicalActions)}"`;
 
-    const introDataSource = {
-      headlineTemplateData: {
-        type: "object",
-        properties: {
-          textContent: {
-            primaryText: {
-              text: formatIntroHeader(introString),
-            },
-          },
-          hintText,
-          backgroundImage: {
-            sources: [
-              {
-                url: "https://i.imgur.com/7622Qek.jpg",
-              },
-            ],
-          },
-        },
-      },
-    };
-
-    const aplSupported =
-      handlerInput.requestEnvelope.context.System.device.supportedInterfaces[
-        "Alexa.Presentation.APL"
-      ];
-
     let responseBuilder = handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt(hintText);
 
-    if (aplSupported) {
-      responseBuilder.addDirective({
-        type: "Alexa.Presentation.APL.RenderDocument",
-        token: "intro",
-        document: introScreenApl,
-        datasources: introDataSource,
-      });
+    const aplDirective = buildAplResponse(
+      handlerInput,
+      introString,
+      "Super AI",
+      null,
+      "intro",
+      hintText
+    );
+    if (aplDirective) {
+      responseBuilder.addDirective(aplDirective);
     }
 
     return responseBuilder.getResponse();

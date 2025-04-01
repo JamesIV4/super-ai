@@ -1,18 +1,37 @@
-const getRandomString = (stringArray) => {
-    const randomIndex = Math.floor(Math.random() * stringArray.length);
-    return stringArray[randomIndex];
-}
+const AWS = require("aws-sdk");
 
-const getAorAn = (word) => ['a', 'e', 'i', 'o', 'u'].includes(word.toLowerCase().charAt(0)) ? 'an' : 'a';
+const getRandomString = (strings) => {
+  return strings[Math.floor(Math.random() * strings.length)];
+};
 
-function removeNarrators(text) {
-    // Define the prefixes to remove
-    const narrators = ['Amy: ', 'Matthew: '];
-    
-    // Use a regular expression to replace any of the prefixes with an empty string
-    const regex = new RegExp('^(' + narrators.join('|') + ')', 'i');
-    
-    return text.replace(regex, '');
-}
+const getAorAn = (word) => {
+  const vowels = ["a", "e", "i", "o", "u"];
+  return vowels.includes(word[0].toLowerCase()) ? "an" : "a";
+};
 
-module.exports = { getRandomString, getAorAn, removeNarrators }
+const removeNarrators = (text) => {
+  return text.replace(/^(Amy|Matthew):\s*/i, "");
+};
+
+const getS3PreSignedUrl = (key) => {
+  const s3 = new AWS.S3();
+  const params = {
+    Bucket: process.env.S3_PERSISTENCE_BUCKET,
+    Key: key,
+    Expires: 60, // URL expires in 60 seconds
+  };
+
+  try {
+    return s3.getSignedUrlPromise("getObject", params);
+  } catch (error) {
+    console.error("Error generating pre-signed URL:", error);
+    return null;
+  }
+};
+
+module.exports = {
+  getRandomString,
+  getAorAn,
+  removeNarrators,
+  getS3PreSignedUrl,
+};

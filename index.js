@@ -4,7 +4,112 @@ const Alexa = require("ask-sdk-core");
 const { openai } = require("./api");
 
 const { introScreenApl, responseScreenApl } = require("./apl");
-const { getRandomString, getAorAn, removeNarrators } = require("./util");
+const {
+  getRandomString,
+  getAorAn,
+  removeNarrators,
+  getS3PreSignedUrl,
+} = require("./util");
+
+// Story preparation cache
+const storyCache = new Map();
+
+// Cache cleanup - AWS Lambda instances persist between invocations
+// This function helps prevent memory leaks by removing old entries
+const cleanupStoryCache = () => {
+  const MAX_CACHE_SIZE = 50; // Adjust based on expected load
+
+  if (storyCache.size > MAX_CACHE_SIZE) {
+    console.log(`Cleaning up story cache. Current size: ${storyCache.size}`);
+    // Convert to array, sort by timestamp, and keep only the newest MAX_CACHE_SIZE entries
+    const cacheEntries = Array.from(storyCache.entries());
+    const entriesToDelete = cacheEntries.slice(
+      0,
+      cacheEntries.length - MAX_CACHE_SIZE
+    );
+
+    for (const [key] of entriesToDelete) {
+      storyCache.delete(key);
+    }
+
+    console.log(`Story cache cleaned up. New size: ${storyCache.size}`);
+  }
+};
+
+// Background story preparation
+const prepareStoryInBackground = async (storySubject, requestId) => {
+  console.log(
+    `Starting background story preparation for: ${storySubject} with ID: ${requestId}`
+  );
+
+  try {
+    // Make the OpenAI API call
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      max_tokens: 4096,
+      messages: [
+        {
+          role: "system",
+          content: `Ignore previous instructions: You are now a one-shot story bot that is imaginative and fun. No questions. AVOID clichéd endings like "From that day on" (please!). Choose single narrator tag "Amy: " or "Matthew: "`,
+        },
+        { role: "user", content: `Tell ${storySubject}` },
+      ],
+    });
+
+    console.log(
+      "------------------- AI FULL RESPONSE -------------------",
+      JSON.stringify(completion)
+    );
+
+    const voices = ["Amy", "Matthew"];
+    let aiResponse = completion.choices[0].message.content;
+    const aiChosenVoice = aiResponse.toLowerCase().includes("amy:")
+      ? "Amy"
+      : aiResponse.toLowerCase().includes("matthew:")
+      ? "Matthew"
+      : "";
+
+    // Remove the narrator tag
+    if (aiChosenVoice.length) {
+      aiResponse = removeNarrators(aiResponse);
+    }
+
+    const ssmlSpeech = `<voice name='${
+      aiChosenVoice ? aiChosenVoice : getRandomString(voices)
+    }'>${aiResponse}</voice>`;
+
+    // Store the prepared story in the cache
+    storyCache.set(requestId, {
+      status: "ready",
+      ssmlSpeech,
+      textContent: aiResponse,
+      error: null,
+      timestamp: Date.now(),
+    });
+
+    console.log(`Story preparation complete for ID: ${requestId}`);
+    console.log(
+      `Updated session attributes for request ID: ${requestId}, story ready: true`
+    );
+  } catch (error) {
+    console.error("Error querying OpenAI:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      status: error.status,
+      response: error.response ? JSON.stringify(error.response) : "No response",
+    });
+
+    // Update the cache with error information
+    storyCache.set(requestId, {
+      status: "error",
+      ssmlSpeech: null,
+      textContent: null,
+      error: error.message,
+      timestamp: Date.now(),
+    });
+  }
+};
 
 // Common utility functions
 const BACKGROUND_IMAGE_URL = "https://i.imgur.com/7622Qek.jpg";
@@ -271,7 +376,7 @@ const StoryIntentHandler = {
       Alexa.getIntentName(handlerInput.requestEnvelope) === "StoryIntent"
     );
   },
-  async handle(handlerInput) {
+  handle(handlerInput) {
     const storySubject = Alexa.getSlotValue(
       handlerInput.requestEnvelope,
       "subject"
@@ -280,68 +385,37 @@ const StoryIntentHandler = {
     console.log(
       `------------------- Got StoryIntent request ------------------- ${storySubject}`
     );
-    try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        max_tokens: 4096,
-        messages: [
-          {
-            role: "system",
-            content: `Ignore previous instructions: You are now a one-shot story bot that is imaginative and fun. No questions. AVOID clichéd endings like "From that day on" (please!). Choose single narrator tag "Amy: " or "Matthew: "`,
-          },
-          { role: "user", content: `Tell ${storySubject}` },
-        ],
-      });
 
-      console.log(
-        "------------------- AI FULL RESPONSE -------------------",
-        JSON.stringify(completion)
-      );
+    // Generate a unique ID for this story request
+    const requestId = handlerInput.requestEnvelope.request.requestId;
 
-      const voices = ["Amy", "Matthew"];
-      let aiResponse = completion.choices[0].message.content;
-      const aiChosenVoice = aiResponse.toLowerCase().includes("amy:")
-        ? "Amy"
-        : aiResponse.toLowerCase().includes("matthew:")
-        ? "Matthew"
-        : "";
+    // Initialize the story in the cache
+    storyCache.set(requestId, {
+      status: "preparing",
+      ssmlSpeech: null,
+      textContent: null,
+      error: null,
+      timestamp: Date.now(),
+    });
 
-      // Remove the narrator tag
-      if (aiChosenVoice.length) {
-        aiResponse = removeNarrators(aiResponse);
-      }
+    // Start the background story preparation (completely detached from this handler)
+    // We don't await this promise, it runs entirely in the background
+    prepareStoryInBackground(storySubject, requestId);
 
-      const ssmlSpeech = `<voice name='${
-        aiChosenVoice ? aiChosenVoice : getRandomString(voices)
-      }'>${aiResponse}</voice>`;
+    // Get session attributes to store subject for the second part of the response
+    const sessionAttributes =
+      handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes.storyRequestId = requestId;
+    sessionAttributes.awaitingStoryConfirmation = true;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-      console.log(
-        "------------------- aiResponse -------------------",
-        aiResponse
-      );
-
-      let responseBuilder = handlerInput.responseBuilder
-        .speak(ssmlSpeech)
-        .reprompt("Do you want to hear another story");
-
-      const aplDirective = buildAplResponse(
-        handlerInput,
-        aiResponse,
-        "Super AI",
-        ssmlSpeech
-      );
-      if (aplDirective) {
-        responseBuilder.addDirective(aplDirective);
-      }
-
-      return responseBuilder.getResponse();
-    } catch (error) {
-      console.error("Error querying OpenAI:", error);
-      return buildErrorResponse(
-        handlerInput,
-        "Sorry, there was a problem getting the AI response."
-      );
-    }
+    // Immediately respond to the user
+    return handlerInput.responseBuilder
+      .speak(
+        "I'm preparing your story. <break time='1s'/> Would you like to hear it when it's ready?"
+      )
+      .reprompt("Would you like to hear the story when it's ready?")
+      .getResponse();
   },
 };
 
@@ -381,6 +455,104 @@ const YesIntentHandler = {
   handle(handlerInput) {
     console.log("------------------- Got YesIntent -------------------");
 
+    // Get session attributes
+    const sessionAttributes =
+      handlerInput.attributesManager.getSessionAttributes();
+
+    // Check if we're awaiting confirmation to play a story
+    if (
+      sessionAttributes.awaitingStoryConfirmation &&
+      sessionAttributes.storyRequestId
+    ) {
+      const requestId = sessionAttributes.storyRequestId;
+      const storyData = storyCache.get(requestId);
+
+      if (!storyData) {
+        // This shouldn't happen, but just in case
+        return handlerInput.responseBuilder
+          .speak(
+            "I'm sorry, I couldn't find your story. Would you like to try asking for a different story?"
+          )
+          .reprompt("Would you like to try asking for a different story?")
+          .getResponse();
+      }
+
+      // Check the status of the story
+      if (storyData.status === "preparing") {
+        // Check if it's been more than 60 seconds since the request
+        const currentTime = Date.now();
+        const waitTime = currentTime - (storyData.timestamp || 0);
+
+        if (waitTime > 60000) {
+          // It's been a long time, let's check if maybe it's ready but the status wasn't updated
+          return handlerInput.responseBuilder
+            .speak(
+              "I'm still working on your story. It's taking longer than expected. Would you like to wait a bit longer?"
+            )
+            .reprompt("Would you like to wait a bit longer for your story?")
+            .getResponse();
+        }
+
+        return handlerInput.responseBuilder
+          .speak(
+            "I'm still preparing your story. Would you like me to check if it's ready now?"
+          )
+          .reprompt("Would you like me to check if the story is ready now?")
+          .getResponse();
+      }
+
+      if (storyData.status === "error") {
+        // Reset the flags
+        sessionAttributes.awaitingStoryConfirmation = false;
+        sessionAttributes.storyRequestId = null;
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        // Clean up the cache
+        storyCache.delete(requestId);
+
+        return handlerInput.responseBuilder
+          .speak(
+            "I'm sorry, there was a problem preparing your story. Would you like to try again?"
+          )
+          .reprompt("Would you like to try asking for a story again?")
+          .getResponse();
+      }
+
+      if (storyData.status === "ready") {
+        // Reset the flags
+        sessionAttributes.awaitingStoryConfirmation = false;
+        sessionAttributes.storyRequestId = null;
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        console.log(
+          "------------------- Delivering prepared story -------------------"
+        );
+
+        // Deliver the story
+        let responseBuilder = handlerInput.responseBuilder
+          .speak(storyData.ssmlSpeech)
+          .reprompt("Would you like to hear another story?");
+
+        // Add APL if supported
+        const aplDirective = buildAplResponse(
+          handlerInput,
+          storyData.textContent,
+          "Super AI",
+          storyData.ssmlSpeech
+        );
+
+        if (aplDirective) {
+          responseBuilder.addDirective(aplDirective);
+        }
+
+        // Clean up the cache
+        storyCache.delete(requestId);
+
+        return responseBuilder.getResponse();
+      }
+    }
+
+    // Default response if not awaiting story confirmation
     const speakOutput = "Ask me another question!";
 
     let responseBuilder = handlerInput.responseBuilder
@@ -406,6 +578,36 @@ const NoIntentHandler = {
   handle(handlerInput) {
     console.log("------------------- Got NoIntent -------------------");
 
+    // Get session attributes
+    const sessionAttributes =
+      handlerInput.attributesManager.getSessionAttributes();
+
+    // Check if we're awaiting confirmation to play a story
+    if (
+      sessionAttributes.awaitingStoryConfirmation &&
+      sessionAttributes.storyRequestId
+    ) {
+      // Reset the flag
+      sessionAttributes.awaitingStoryConfirmation = false;
+      const requestId = sessionAttributes.storyRequestId;
+      sessionAttributes.storyRequestId = null;
+      handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+      // Clean up the cache
+      if (storyCache.has(requestId)) {
+        storyCache.delete(requestId);
+      }
+
+      // Respond to the user's rejection of the story
+      return handlerInput.responseBuilder
+        .speak(
+          "No problem. You can ask for a different story or question whenever you're ready."
+        )
+        .reprompt("What would you like to do?")
+        .getResponse();
+    }
+
+    // Default goodbye response
     const goodbyeString = getGoodbyeString();
 
     let responseBuilder = handlerInput.responseBuilder.speak(goodbyeString);
@@ -486,9 +688,11 @@ const SessionEndedRequestHandler = {
   },
   handle(handlerInput) {
     const reason = handlerInput.requestEnvelope.request.reason;
+    const error = handlerInput.requestEnvelope.request.error;
 
     console.log(
-      `~~~~~~~~~~~~ Session ended with reason: ${reason} ~~~~~~~~~~~~`
+      `~~~~~~~~~~~~ Session ended with reason: ${reason} ~~~~~~~~~~~~
+      ${error ? JSON.stringify(error) : ""}`
     );
     console.log(
       "~~~~~~~~~~~~ Session ended ~~~~~~~~~~~~",
@@ -536,17 +740,26 @@ const ErrorHandler = {
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
  * defined are included below. The order matters - they're processed top to bottom
  * */
-exports.handler = Alexa.SkillBuilders.custom()
-  .addRequestHandlers(
-    LaunchRequestHandler,
-    QuestionIntentHandler,
-    StoryIntentHandler,
-    YesIntentHandler,
-    NoIntentHandler,
-    HelpIntentHandler,
-    CancelAndStopIntentHandler,
-    FallbackIntentHandler,
-    SessionEndedRequestHandler
-  )
-  .addErrorHandlers(ErrorHandler)
-  .lambda();
+exports.handler = async (event, context) => {
+  // Clean up the story cache on each invocation
+  cleanupStoryCache();
+
+  // Create the skill instance
+  const skill = Alexa.SkillBuilders.custom()
+    .addRequestHandlers(
+      LaunchRequestHandler,
+      QuestionIntentHandler,
+      StoryIntentHandler,
+      YesIntentHandler,
+      NoIntentHandler,
+      HelpIntentHandler,
+      CancelAndStopIntentHandler,
+      FallbackIntentHandler,
+      SessionEndedRequestHandler
+    )
+    .addErrorHandlers(ErrorHandler)
+    .withApiClient(new Alexa.DefaultApiClient())
+    .create();
+
+  return skill.invoke(event, context);
+};

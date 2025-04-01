@@ -4,12 +4,7 @@ const Alexa = require("ask-sdk-core");
 const { openai } = require("./api");
 
 const { introScreenApl, responseScreenApl } = require("./apl");
-const {
-  getRandomString,
-  getAorAn,
-  removeNarrators,
-  getS3PreSignedUrl,
-} = require("./util");
+const { getRandomString, getAorAn, removeNarrators } = require("./util");
 
 // Story preparation cache - just stores the most recent story
 let currentStory = null;
@@ -52,7 +47,7 @@ const prepareStoryInBackground = async (storySubject) => {
           messages: [
             {
               role: "system",
-              content: `Ignore previous instructions: You are now a one-shot story bot that is imaginative and fun. No questions. AVOID clichéd endings like "From that day on" (please!). Choose single narrator tag "Amy: " or "Matthew: "`,
+              content: "Tell a one-shot story that is imaginative and fun.",
             },
             { role: "user", content: `Tell ${storySubject}` },
           ],
@@ -255,21 +250,21 @@ const getGoodbyeString = () => {
 // Story preparation status messages
 const storyPreparationMessages = {
   longWait: [
-    "Your story is taking longer than expected. <break time='1s'/> Would you like to keep waiting?",
+    "Your story is taking longer than expected. <break time='30s'/> Would you like to check if your story is ready now?",
   ],
   mediumWait: [
-    "I'm still working on your story. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
-    "Your story is still coming together. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
-    "I'm still crafting your story with care. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
-    "The story is still taking shape. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
-    "I'm still adding the finishing touches to your story. Please wait a little longer. <break time='10s'/> Would you like to check if your story is ready now?",
+    "I'm still working on your story. Please wait a little longer. <break time='15s'/> Would you like to check if your story is ready now?",
+    "Your story is still coming together. Please wait a little longer. <break time='15s'/> Would you like to check if your story is ready now?",
+    "I'm still crafting your story with care. Please wait a little longer. <break time='15s'/> Would you like to check if your story is ready now?",
+    "The story is still taking shape. Please wait a little longer. <break time='15s'/> Would you like to check if your story is ready now?",
+    "I'm still adding the finishing touches to your story. Please wait a little longer. <break time='15s'/> Would you like to check if your story is ready now?",
   ],
   shortWait: [
-    "I'm still preparing your story. Please wait. <break time='10s'/> Would you like to check if your story is ready now?  ",
-    "Your story is in the works. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
-    "I'm working on your story. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
-    "The story is being created. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
-    "I'm getting your story ready. Please wait. <break time='10s'/> Would you like to check if your story is ready now?",
+    "I'm still preparing your story. Please wait. <break time='15s'/> Would you like to check if your story is ready now?  ",
+    "Your story is in the works. Please wait. <break time='15s'/> Would you like to check if your story is ready now?",
+    "I'm working on your story. Please wait. <break time='15s'/> Would you like to check if your story is ready now?",
+    "The story is being created. Please wait. <break time='15s'/> Would you like to check if your story is ready now?",
+    "I'm getting your story ready. Please wait. <break time='15s'/> Would you like to check if your story is ready now?",
   ],
 };
 
@@ -780,7 +775,6 @@ exports.handler = async (event, context) => {
       SessionEndedRequestHandler
     )
     .addErrorHandlers(ErrorHandler)
-    .withApiClient(new Alexa.DefaultApiClient())
     .create();
 
   return skill.invoke(event, context);

@@ -356,7 +356,7 @@ const HelpIntentHandler = {
     console.log("------------------- Got HelpIntent -------------------");
 
     const speakOutput =
-      "Just ask me a question or anything really! I'll do my best to answer it. What do you want to know";
+      "Just ask me a question or anything really! I'll do my best to answer it. What do you want to know?";
 
     let responseBuilder = handlerInput.responseBuilder
       .speak(speakOutput)

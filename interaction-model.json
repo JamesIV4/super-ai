@@ -1,0 +1,77 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "super a. i.",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "QuestionIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "what's {question}",
+                        "look {question}",
+                        "find {question}",
+                        "are {question}",
+                        "am {question}",
+                        "should {question}",
+                        "explain {question}",
+                        "which {question}",
+                        "does {question}",
+                        "can {question}",
+                        "how {question}",
+                        "is {question}",
+                        "where {question}",
+                        "who {question}",
+                        "what {question}",
+                        "ask {question}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.YesIntent",
+                    "samples": []
+                },
+                {
+                    "name": "StoryIntent",
+                    "slots": [
+                        {
+                            "name": "subject",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "tell {subject}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NoIntent",
+                    "samples": []
+                }
+            ],
+            "types": []
+        }
+    }
+}

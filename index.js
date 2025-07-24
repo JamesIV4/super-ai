@@ -4,7 +4,12 @@ const Alexa = require("ask-sdk-core");
 const { openai } = require("./api");
 
 const { introScreenApl, responseScreenApl } = require("./apl");
-const { getRandomString, getAorAn, removeNarrators } = require("./util");
+const {
+  getRandomString,
+  getAorAn,
+  removeNarrators,
+  extractText,
+} = require("./util");
 
 // Common utility functions
 const BACKGROUND_IMAGE_URL = "https://i.imgur.com/7622Qek.jpg";
@@ -220,30 +225,74 @@ const QuestionIntentHandler = {
     );
   },
   async handle(handlerInput) {
-    const userQuery = Alexa.getSlotValue(
-      handlerInput.requestEnvelope,
-      "question"
-    );
+    // 1) Full transcript
+    const transcript =
+      handlerInput.requestEnvelope.request.inputTranscript || "";
 
-    console.log(
-      "------------------- Got QuestionIntent request -------------------",
-      userQuery
-    );
+    // 2) Parsed slot
+    const userQuery =
+      Alexa.getSlotValue(handlerInput.requestEnvelope, "question") || "";
+
+    console.log("---- Got QuestionIntent:", { userQuery, transcript });
+
+    // Grab session attributes
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes() || {};
+    const prevResponseId = sessionAttributes.prevResponseId;
+
+    // 3) Helper to normalize & diff words
+    function getTriggerWords(fullText, slotText) {
+      const normalize = (str) =>
+        str
+          .toLowerCase()
+          .replace(/[^\w\s]/g, "")
+          .split(/\s+/)
+          .filter(Boolean);
+
+      const fullWords = normalize(fullText);
+      const slotWords = normalize(slotText);
+      return fullWords.filter((w) => !slotWords.includes(w));
+    }
+
+    // 4) Compute triggers
+    const triggers = getTriggerWords(transcript, userQuery);
+    const triggerPhrase = triggers.length ? triggers.join(" ") : "";
+
+    console.log("Trigger words:", triggers);
+
+    // 5) Rebuild the final query
+    const finalQuery = triggerPhrase
+      ? `${triggerPhrase} ${userQuery}`
+      : userQuery;
+
+    console.log("Final query to AI:", finalQuery);
 
     try {
-      const completion = await openai.chat.completions.create({
+      // 6) Build request body; include previous_response_id only if present
+      let requestBody = {
         model: "gpt-4o",
-        max_tokens: 4096,
-        messages: [{ role: "user", content: userQuery }],
-      });
+        max_output_tokens: 1024,
+        input: finalQuery,
+      };
 
-      const aiResponse = completion.choices[0].message.content;
+      if (prevResponseId) {
+        requestBody.previous_response_id = prevResponseId;
+      }
 
-      console.log(
-        "------------------- aiResponse -------------------",
-        aiResponse
-      );
+      const response = await openai.responses.create(requestBody);
 
+      // Extract text
+      const aiResponse = response.output_text
+        ? response.output_text
+        : extractText(response);
+
+      console.log("---- AI Full Response:", response);
+
+      // 7) Save the new response id in session
+      sessionAttributes.prevResponseId = response.id;
+      attributesManager.setSessionAttributes(sessionAttributes);
+
+      // 8) Build Alexa response
       let responseBuilder = handlerInput.responseBuilder
         .speak(aiResponse)
         .reprompt("Do you want to ask another question?");
@@ -281,25 +330,26 @@ const StoryIntentHandler = {
       `------------------- Got StoryIntent request ------------------- ${storySubject}`
     );
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        max_tokens: 4096,
-        messages: [
-          {
-            role: "system",
-            content: `Ignore previous instructions: You are now a one-shot story bot that is imaginative and fun. No questions. AVOID clichéd endings like "From that day on" (please!). Choose single narrator tag "Amy: " or "Matthew: "`,
-          },
-          { role: "user", content: `Tell ${storySubject}` },
-        ],
+      const response = await openai.responses.create({
+        model: "gpt-4.1-mini",
+        input: `Tell ${storySubject}`,
+        store: false,
+        instructions: `You are now a one-shot story bot that is imaginative and fun. No questions. Choose single narrator tag "Amy: " or "Matthew: "`,
+        max_output_tokens: 800, // tune to fit Alexa time window
+        temperature: 0.9,
       });
+
+      // response.output_text is a convenience string with all text concatenated
+      let aiResponse = response.output_text
+        ? response.output_text
+        : extractText(response);
 
       console.log(
         "------------------- AI FULL RESPONSE -------------------",
-        JSON.stringify(completion)
+        JSON.stringify(aiResponse)
       );
 
       const voices = ["Amy", "Matthew"];
-      let aiResponse = completion.choices[0].message.content;
       const aiChosenVoice = aiResponse.toLowerCase().includes("amy:")
         ? "Amy"
         : aiResponse.toLowerCase().includes("matthew:")

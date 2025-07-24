@@ -1,4 +1,3 @@
-const AWS = require("aws-sdk");
 const Alexa = require("ask-sdk-core");
 
 const { openai } = require("./api");
@@ -250,6 +249,10 @@ const TriggerIntentHandler = {
     );
   },
   async handle(handlerInput) {
+    console.log(
+      "--------------- GOT TriggerIntentHandler ----------------",
+      finalQuery
+    );
     const req = handlerInput.requestEnvelope.request;
     const intentName = req.intent.name;
     const triggerWord = INTENT_TRIGGER_MAP[intentName];
@@ -258,6 +261,8 @@ const TriggerIntentHandler = {
       Alexa.getSlotValue(handlerInput.requestEnvelope, "question") || "";
 
     const finalQuery = `${triggerWord} ${question}`.trim();
+
+    console.log("Final Query: ", finalQuery);
 
     // Session attrs, prev id, request to OpenAI (as you had):
     const attributesManager = handlerInput.attributesManager;

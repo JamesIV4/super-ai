@@ -9,7 +9,8 @@
   "author": "James Pound IV",
   "license": "Apache License",
   "dependencies": {
-    "util": "0.12.5",
+    "ask-sdk-core": "^2.7.0",
+    "ask-sdk-model": "^1.19.0",
     "openai": "^4.58.0"
   }
 }

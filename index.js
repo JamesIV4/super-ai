@@ -9,6 +9,9 @@ const {
   getAorAn,
   removeNarrators,
   extractText,
+  safeStringify,
+  logRequestContext,
+  logError,
 } = require("./util");
 
 // Common utility functions
@@ -217,58 +220,51 @@ const LaunchRequestHandler = {
   },
 };
 
-const QuestionIntentHandler = {
+// Intent name -> trigger word
+const INTENT_TRIGGER_MAP = {
+  WhatsIntent: "what's",
+  LookIntent: "look",
+  FindIntent: "find",
+  AreIntent: "are",
+  AmIntent: "am",
+  ShouldIntent: "should",
+  ExplainIntent: "explain",
+  WhichIntent: "which",
+  DoesIntent: "does",
+  CanIntent: "can",
+  HowIntent: "how",
+  IsIntent: "is",
+  WhereIntent: "where",
+  WhoIntent: "who",
+  WhatIntent: "what",
+  AskIntent: "ask",
+};
+Object.freeze(INTENT_TRIGGER_MAP);
+
+const TriggerIntentHandler = {
   canHandle(handlerInput) {
+    const req = handlerInput.requestEnvelope.request;
     return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === "QuestionIntent"
+      req.type === "IntentRequest" &&
+      INTENT_TRIGGER_MAP.hasOwnProperty(req.intent.name)
     );
   },
   async handle(handlerInput) {
-    // 1) Full transcript
-    const transcript =
-      handlerInput.requestEnvelope.request.inputTranscript || "";
+    const req = handlerInput.requestEnvelope.request;
+    const intentName = req.intent.name;
+    const triggerWord = INTENT_TRIGGER_MAP[intentName];
 
-    // 2) Parsed slot
-    const userQuery =
+    const question =
       Alexa.getSlotValue(handlerInput.requestEnvelope, "question") || "";
 
-    console.log("---- Got QuestionIntent:", { userQuery, transcript });
+    const finalQuery = `${triggerWord} ${question}`.trim();
 
-    // Grab session attributes
+    // Session attrs, prev id, request to OpenAI (as you had):
     const attributesManager = handlerInput.attributesManager;
     const sessionAttributes = attributesManager.getSessionAttributes() || {};
     const prevResponseId = sessionAttributes.prevResponseId;
 
-    // 3) Helper to normalize & diff words
-    function getTriggerWords(fullText, slotText) {
-      const normalize = (str) =>
-        str
-          .toLowerCase()
-          .replace(/[^\w\s]/g, "")
-          .split(/\s+/)
-          .filter(Boolean);
-
-      const fullWords = normalize(fullText);
-      const slotWords = normalize(slotText);
-      return fullWords.filter((w) => !slotWords.includes(w));
-    }
-
-    // 4) Compute triggers
-    const triggers = getTriggerWords(transcript, userQuery);
-    const triggerPhrase = triggers.length ? triggers.join(" ") : "";
-
-    console.log("Trigger words:", triggers);
-
-    // 5) Rebuild the final query
-    const finalQuery = triggerPhrase
-      ? `${triggerPhrase} ${userQuery}`
-      : userQuery;
-
-    console.log("Final query to AI:", finalQuery);
-
     try {
-      // 6) Build request body; include previous_response_id only if present
       let requestBody = {
         model: "gpt-4o",
         max_output_tokens: 1024,
@@ -280,31 +276,26 @@ const QuestionIntentHandler = {
       }
 
       const response = await openai.responses.create(requestBody);
-
-      // Extract text
       const aiResponse = response.output_text
         ? response.output_text
         : extractText(response);
 
       console.log("---- AI Full Response:", response);
 
-      // 7) Save the new response id in session
+      // Save the new response id in session
       sessionAttributes.prevResponseId = response.id;
       attributesManager.setSessionAttributes(sessionAttributes);
 
-      // 8) Build Alexa response
-      let responseBuilder = handlerInput.responseBuilder
+      let rb = handlerInput.responseBuilder
         .speak(aiResponse)
         .reprompt("Do you want to ask another question?");
 
       const aplDirective = buildAplResponse(handlerInput, aiResponse);
-      if (aplDirective) {
-        responseBuilder.addDirective(aplDirective);
-      }
+      if (aplDirective) rb.addDirective(aplDirective);
 
-      return responseBuilder.getResponse();
-    } catch (error) {
-      console.error("Error querying OpenAI:", error);
+      return rb.getResponse();
+    } catch (err) {
+      console.error("Error querying OpenAI:", err);
       return buildErrorResponse(
         handlerInput,
         "Sorry, there was a problem getting the AI response."
@@ -558,25 +549,42 @@ const SessionEndedRequestHandler = {
   },
 };
 
-/**
- * Generic error handling to capture any syntax or routing errors. If you receive an error
- * stating the request handler chain is not found, you have not implemented a handler for
- * the intent being invoked or included it in the skill builder below
- * */
 const ErrorHandler = {
   canHandle() {
     return true;
   },
   handle(handlerInput, error) {
     console.log("------------------- Got ErrorHandler -------------------");
+    logRequestContext(handlerInput);
+    logError(error);
 
-    const speakOutput =
-      "Sorry, I had trouble doing what you asked. Please try again.";
-    console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
+    // Try to glean what intent was being processed (if any)
+    let intentName = "N/A";
+    try {
+      const req = handlerInput.requestEnvelope.request;
+      if (req.type === "IntentRequest") {
+        intentName = req.intent.name || "UnknownIntentName";
+      } else {
+        intentName = `Non-Intent: ${req.type}`;
+      }
+    } catch (e) {
+      console.log("Unable to infer intent name in ErrorHandler:", e);
+    }
+    console.log(`---- Inferred Intent: ${intentName}`);
+
+    // Optionally, add a card or speak different output in dev
+    const isDev = !!process.env.DEBUG;
+    const speakOutput = isDev
+      ? "Debug mode: I hit an error. Check CloudWatch logs for details."
+      : "Sorry, I had trouble doing what you asked. Please try again.";
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
-      .reprompt(speakOutput)
+      .reprompt("Please try again.")
+      .withSimpleCard(
+        "Error",
+        isDev ? "Check logs for details." : "An error occurred."
+      )
       .getResponse();
   },
 };
@@ -589,7 +597,7 @@ const ErrorHandler = {
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
-    QuestionIntentHandler,
+    TriggerIntentHandler,
     StoryIntentHandler,
     YesIntentHandler,
     NoIntentHandler,

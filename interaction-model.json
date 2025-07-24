@@ -24,7 +24,7 @@
                     "samples": []
                 },
                 {
-                    "name": "QuestionIntent",
+                    "name": "WhatsIntent",
                     "slots": [
                         {
                             "name": "question",
@@ -33,20 +33,188 @@
                     ],
                     "samples": [
                         "what's {question}",
+                        "what is {question}"
+                    ]
+                },
+                {
+                    "name": "LookIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
                         "look {question}",
+                        "look up {question}"
+                    ]
+                },
+                {
+                    "name": "FindIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
                         "find {question}",
-                        "are {question}",
-                        "am {question}",
-                        "should {question}",
-                        "explain {question}",
-                        "which {question}",
-                        "does {question}",
-                        "can {question}",
-                        "how {question}",
-                        "is {question}",
-                        "where {question}",
-                        "who {question}",
-                        "what {question}",
+                        "find out {question}"
+                    ]
+                },
+                {
+                    "name": "AreIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "are {question}"
+                    ]
+                },
+                {
+                    "name": "AmIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "am {question}"
+                    ]
+                },
+                {
+                    "name": "ShouldIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "should {question}"
+                    ]
+                },
+                {
+                    "name": "ExplainIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "explain {question}"
+                    ]
+                },
+                {
+                    "name": "WhichIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "which {question}"
+                    ]
+                },
+                {
+                    "name": "DoesIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "does {question}"
+                    ]
+                },
+                {
+                    "name": "CanIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "can {question}"
+                    ]
+                },
+                {
+                    "name": "HowIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "how {question}"
+                    ]
+                },
+                {
+                    "name": "IsIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "is {question}"
+                    ]
+                },
+                {
+                    "name": "WhereIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "where {question}"
+                    ]
+                },
+                {
+                    "name": "WhoIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "who {question}"
+                    ]
+                },
+                {
+                    "name": "WhatIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "what {question}"
+                    ]
+                },
+                {
+                    "name": "AskIntent",
+                    "slots": [
+                        {
+                            "name": "question",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
                         "ask {question}"
                     ]
                 },

@@ -1,3 +1,4 @@
+const util = require("util");
 const AWS = require("aws-sdk");
 
 const getRandomString = (strings) => {
@@ -45,10 +46,52 @@ const extractText = (resp) => {
     .join("\n");
 };
 
+function safeStringify(obj) {
+  try {
+    return JSON.stringify(obj, Object.getOwnPropertyNames(obj), 2);
+  } catch (e) {
+    return util.inspect(obj, { depth: 5 });
+  }
+}
+
+function logRequestContext(handlerInput) {
+  try {
+    const envCopy = handlerInput.requestEnvelope
+      ? JSON.parse(JSON.stringify(handlerInput.requestEnvelope))
+      : null;
+    console.log("---- RequestEnvelope ----");
+    console.log(safeStringify(envCopy));
+  } catch (e) {
+    console.log("Failed to stringify requestEnvelope:", e);
+  }
+}
+
+function logError(error) {
+  console.error("---- ERROR OBJECT ----");
+  // Include non-enumerable props like message/stack
+  const errObj = {};
+  Object.getOwnPropertyNames(error || {}).forEach((key) => {
+    errObj[key] = error[key];
+  });
+  console.error(safeStringify(errObj));
+
+  if (error.stack) {
+    console.error("---- STACK ----");
+    console.error(error.stack);
+  }
+  if (error.cause) {
+    console.error("---- CAUSE ----");
+    console.error(safeStringify(error.cause));
+  }
+}
+
 module.exports = {
   getRandomString,
   getAorAn,
   removeNarrators,
   getS3PreSignedUrl,
   extractText,
+  safeStringify,
+  logRequestContext,
+  logError,
 };

@@ -249,10 +249,7 @@ const TriggerIntentHandler = {
     );
   },
   async handle(handlerInput) {
-    console.log(
-      "--------------- GOT TriggerIntentHandler ----------------",
-      finalQuery
-    );
+    console.log("--------------- GOT TriggerIntentHandler ----------------");
     const req = handlerInput.requestEnvelope.request;
     const intentName = req.intent.name;
     const triggerWord = INTENT_TRIGGER_MAP[intentName];

@@ -8,7 +8,6 @@ const {
   getAorAn,
   removeNarrators,
   extractText,
-  safeStringify,
   logRequestContext,
   logError,
 } = require("./util");
@@ -219,7 +218,8 @@ const LaunchRequestHandler = {
   },
 };
 
-// Intent name -> trigger word
+/* ===== Hybrid routing with one handler for all single-word intents ===== */
+/* Intent name -> trigger word */
 const INTENT_TRIGGER_MAP = {
   WhatsIntent: "what's",
   LookIntent: "look",
@@ -237,6 +237,58 @@ const INTENT_TRIGGER_MAP = {
   WhoIntent: "who",
   WhatIntent: "what",
   AskIntent: "ask",
+  HiIntent: "hi",
+  HelloIntent: "hello",
+  HeyIntent: "hey",
+  YoIntent: "yo",
+  HiyaIntent: "hiya",
+  SupIntent: "sup",
+  HowdyIntent: "howdy",
+  GreetingsIntent: "greetings",
+  OkayIntent: "okay",
+  OhIntent: "oh",
+  AlrightIntent: "alright",
+  RightIntent: "right",
+  YeahIntent: "yeah",
+  WellIntent: "well",
+  SoIntent: "so",
+  UhIntent: "uh",
+  UmIntent: "um",
+  AIntent: "a",
+  AnIntent: "an",
+  TheIntent: "the",
+  AndIntent: "and",
+  OrIntent: "or",
+  ButIntent: "but",
+  IfIntent: "if",
+  DoIntent: "do",
+  DidIntent: "did",
+  BeIntent: "be",
+  WillIntent: "will",
+  WouldIntent: "would",
+  ShallIntent: "shall",
+  MayIntent: "may",
+  MightIntent: "might",
+  MustIntent: "must",
+  HaveIntent: "have",
+  HasIntent: "has",
+  HadIntent: "had",
+  OfIntent: "of",
+  ForIntent: "for",
+  ToIntent: "to",
+  InIntent: "in",
+  OnIntent: "on",
+  AtIntent: "at",
+  ByIntent: "by",
+  WithIntent: "with",
+  FromIntent: "from",
+  AsIntent: "as",
+  AboutIntent: "about",
+  LikeIntent: "like",
+  JustIntent: "just",
+  WasIntent: "was",
+  WereIntent: "were",
+  MyIntent: "my",
 };
 Object.freeze(INTENT_TRIGGER_MAP);
 
@@ -261,7 +313,6 @@ const TriggerIntentHandler = {
 
     console.log("Final Query: ", finalQuery);
 
-    // Session attrs, prev id, request to OpenAI (as you had):
     const attributesManager = handlerInput.attributesManager;
     const sessionAttributes = attributesManager.getSessionAttributes() || {};
     const prevResponseId = sessionAttributes.prevResponseId;
@@ -306,6 +357,7 @@ const TriggerIntentHandler = {
   },
 };
 
+/* ===== Story handling stays distinct with your voice magic ===== */
 const StoryIntentHandler = {
   canHandle(handlerInput) {
     return (
@@ -332,7 +384,6 @@ const StoryIntentHandler = {
         temperature: 0.9,
       });
 
-      // response.output_text is a convenience string with all text concatenated
       let aiResponse = response.output_text
         ? response.output_text
         : extractText(response);
@@ -388,6 +439,7 @@ const StoryIntentHandler = {
   },
 };
 
+/* ===== Built-ins ===== */
 const HelpIntentHandler = {
   canHandle(handlerInput) {
     return (
@@ -490,11 +542,6 @@ const CancelAndStopIntentHandler = {
   },
 };
 
-/* *
- * FallbackIntent triggers when a customer says something that doesn't map to any intents in your skill
- * It must also be defined in the language model (if the locale supports it)
- * This handler can be safely added but will be ignored in locales that do not support it yet
- * */
 const FallbackIntentHandler = {
   canHandle(handlerInput) {
     return (
@@ -515,11 +562,6 @@ const FallbackIntentHandler = {
   },
 };
 
-/* *
- * SessionEndedRequest notifies that a session was ended. This handler will be triggered when a currently open
- * session is closed for one of the following reasons: 1) The user says 'exit' or 'quit'. 2) The user does not
- * respond or says something that does not match an intent defined in your voice model. 3) An error occurs
- * */
 const SessionEndedRequestHandler = {
   canHandle(handlerInput) {
     return (
@@ -560,7 +602,6 @@ const ErrorHandler = {
     logRequestContext(handlerInput);
     logError(error);
 
-    // Try to glean what intent was being processed (if any)
     let intentName = "N/A";
     try {
       const req = handlerInput.requestEnvelope.request;
@@ -574,7 +615,6 @@ const ErrorHandler = {
     }
     console.log(`---- Inferred Intent: ${intentName}`);
 
-    // Optionally, add a card or speak different output in dev
     const isDev = !!process.env.DEBUG;
     const speakOutput = isDev
       ? "Debug mode: I hit an error. Check CloudWatch logs for details."
@@ -591,11 +631,6 @@ const ErrorHandler = {
   },
 };
 
-/**
- * This handler acts as the entry point for your skill, routing all request and response
- * payloads to the handlers above. Make sure any new handlers or interceptors you've
- * defined are included below. The order matters - they're processed top to bottom
- * */
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
